@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<table>
+
+{% if fav_list %}
+    {% for fav in fav_list %}
+                
+        <tr>
+            <td>{{ fav.fav_movie.title }}<br>
+            {{ fav.fav_movie.title_en }}</td>
+            <td><a href="/favorite/del/{{ fav.fav_movie.id }}">移除</a></td>
+        </tr>
+        {% endfor %}
+{% else %}
+    <h1>尚未加入電影</h1>
+
+{% endif %}
+</table>
+{% endblock %}

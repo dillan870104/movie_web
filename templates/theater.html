@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<table>
+    
+    
+        {% for movie in movie_title %}
+            
+        <tr>
+            <td>
+                
+                <a href="movie_time/{{ theaterName }}/{{ movie }}" >{{ movie }}</a>
+            </td>
+        </tr>
+
+        {% endfor %}
+
+</table>
+{% endblock %}

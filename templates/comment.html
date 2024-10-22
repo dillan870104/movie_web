@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<table>
+    {% for info in movie_info %}
+    電影名稱:{{ info.title }}<br>
+    
+    <form action="./{{ info.id }}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <input type="hidden" name="id" value="{{ info.id }}">
+        留言:<input type="text" name="comment"/><br>
+        <input type="submit" value="送出留言"/>
+    </form>
+    {% endfor %}
+</table>
+{% endblock %}

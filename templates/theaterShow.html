@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<table>
+{% for date,type in movie_date %}
+    <tr>
+        <td><h4>{{ date }}</h4></td>
+    </tr>
+    {% for showtime in movie_showtime %}
+    <tr>
+        {% if showtime.date == date %}
+            <td>
+            {{ showtime.playTime }}
+            {{ showtime.roomType }}
+            </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+{% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if movie_info %}
+<table>
+    <tr>
+        <th>電影</th>
+        <th></th>
+        
+        
+    </tr>
+    {% for info in movie_info %}
+        
+        <tr>
+            <td>{{ info.title }}<br>
+                {{ info.title_en }}<br>
+                {{ info.time }}<br>
+                {{ info.release_date }}<br>
+                {{ info.type }}<br>
+                {{ info.director }}<br>
+                {{ info.cast }}<br>
+                
+
+            </td>
+            <td><img src="{{ info.img_src }}" width="400" height="400">  
+        
+                <a href="/comment/{{ info.id }}">我要留言</a> <a href="/favorite/add/{{ info.id }}">加入我的最愛</a>
+                
+                <a href='/'>回上一頁</a>
+            </td>
+        </tr>
+    {% endfor %}
+
+</table>
+{% endif %}
+<!-- {% if show_list %}
+<h1>這是場次資訊</h1>
+<table>
+{% for show in show_list %}
+<tr>
+    <td>{{ show.date }}
+        {{ show.roomType }}
+        {{ show.playTime }}
+        {{ show.theater_name }}<br>
+    </td>
+</tr>
+{% endfor %}
+</table>
+{% endif %} -->
+<h1>留言板</h1>
+{% if text_info %}
+
+<table>
+    {% for text in text_info %}
+    <tr>
+        <td>{{ text.tb_user }} : {{ text.content }}
+            <br>
+        </td>
+    </tr>
+    {% endfor %}
+    </table>
+{% endif %}
+{% endblock %}

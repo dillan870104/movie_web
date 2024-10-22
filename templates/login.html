@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<form action="/login/" method="POST">
+    {% csrf_token %}
+    
+    帳號:<input type="text" name="acc"/><br>        
+    密碼:<input type="password" name="pwd"/>
+    
+    <input type="submit" value="送出資料"/>
+</form>
+{{ mess }}<br>
+
+
+{% endblock %}
