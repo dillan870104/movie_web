@@ -19,9 +19,6 @@ class userAdmin(admin.ModelAdmin):
         "username",
         "registerdate",
         "tel",
-        "profile_pic",
-        "verify_state",
-        "verify_code",
     )
 
 

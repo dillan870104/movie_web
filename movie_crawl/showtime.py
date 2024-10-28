@@ -5,9 +5,20 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from bs4 import BeautifulSoup
 from datetime import datetime
+import requests
+import json
 
 #===============================================
 # 关闭模态弹窗
+def get_pic():
+    url = 'https://capi.showtimes.com.tw/1/app/bootstrap'
+    request = requests.get(url)
+    movielist = request.json()
+    movie_dict = {}
+    for movie in movielist['payload']['programs']:
+        #print(movie['name'],movie['coverImagePortrait']['url'])
+        movie_dict[movie['name']]=movie['coverImagePortrait']['url']
+    return movie_dict
 def showtime_update():
     #爬取所有地點資訊
     def get_showtime_theater():
@@ -189,6 +200,7 @@ def showtime_update():
 
 #===============================================
 # 主流程
+    pic_dict = get_pic()
     theater_dict = get_showtime_theater()
     oP = web.ChromeOptions()
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
@@ -202,7 +214,7 @@ def showtime_update():
         locator = (By.LINK_TEXT, '快速訂票')
         WebDriverWait(myW, 30, 0.5).until(EC.presence_of_element_located(locator))
         #/---------------------測試數量------------------------------------/
-        movie_elements = myW.find_elements(By.CLASS_NAME, "sc-dcJsrY.OvScF")[1:2]
+        movie_elements = myW.find_elements(By.CLASS_NAME, "sc-dcJsrY.OvScF")#測試數量用
         
         for index in range(len(movie_elements)):
             try:
@@ -245,7 +257,12 @@ def showtime_update():
         director = movie.get('導演', 'N/A')
         introduction = movie.get('簡介', 'N/A')
         times = movie['時間']
-
+        try:
+            movie_pic = pic_dict[movie['中文片名']]
+        except:
+            movie_pic = 'N/A'
+            
+        
         # 输出每个個時間段都包含完整電影信息
         for date, theaters in times.items():
             date = date.split('日')[0].strip(' ')
@@ -281,6 +298,7 @@ def showtime_update():
                         '時間': time,
                         '播放種類':theater[1],
                         '影院位置':place,
+                        '圖片網址':movie_pic,
                         
                     }
                     dataList.append(data)

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<table>
+    {% for type in type_list %}
+    
+    <tr>
+        <td><a href="/type/{{ type }}"><h2>{{ type }}</h2></a>
+            
+        </td>
+    </tr>
+
+{% endfor %}
+</table>
+{% endblock %}

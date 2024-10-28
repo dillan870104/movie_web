@@ -5,7 +5,7 @@
 
 <section class="timer">
     <div>
-        <form action="/verify/" method="POST" enctype="multipart/form-data">
+        <form action="/check_ver/" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
         <table>
             <tr>輸入驗證碼</tr>
@@ -13,11 +13,11 @@
                 <td><input type="text" name="v_code"></td>
             </tr>
             <tr>
-                <td><input type="submit",value='送出'></form>
-                    <a href="/"><button class="emailBtn">重新寄送驗證信</button></a></td>
+                <td><input type="submit" value='送出' id='submitBtn'>
+                    <button class="emailBtn">獲取驗證信</button></td>        
             </tr>
         </table>
-        
+        </form>
         
       
       <h1 class="countdownTitle"></h1>
@@ -30,4 +30,6 @@
 
 <script src="{% static 'javascript/timer.js' %}">
 </script>
+
+
 {% endblock %}

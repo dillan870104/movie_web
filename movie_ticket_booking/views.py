@@ -6,9 +6,32 @@ from django.core.mail import EmailMultiAlternatives
 from movie_ticket_booking.form import RegisterForm
 import random
 
+
+# 寄送驗證信
+def send_verify(email, verify):
+
+    email = email
+    subject = "驗證您的電子郵件地址"
+    text_content = f"這是一封驗證信，請輸入下方驗證碼以下完成驗證\n\n"
+    sender_email = "shiguangmulian@gmail.com"
+    recipient_email = f"{email}"
+    html_content = f"""
+        <h1>歡迎加入我們的會員！</h1>
+        <p>親愛的會員您好：</p>
+        <p>這是一封會員驗證信。</p>
+        
+        <p>您的註冊驗證碼為:{verify}</p>
+        
+        
+        </blockquote>
+        """
+    msg = EmailMultiAlternatives(subject, text_content, sender_email, [recipient_email])
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+    return [email, verify]
+
+
 # Create your views here.
-
-
 def movie_update(request, cinemaName):  # 所有電影清單更新在這
     from movie_crawl import miramar, ambassador, miranewcinemas, vieshow, showtime
 
@@ -157,95 +180,94 @@ def movielist(request):
         return render(request, "home.html", locals())
 
 
-def send_verify(email, verify):
-
-    email = email
-    subject = "驗證您的電子郵件地址"
-    text_content = f"這是一封驗證信，請輸入下方驗證碼以下完成驗證\n\n"
-    sender_email = "shiguangmulian@gmail.com"
-    recipient_email = f"{email}"
-    html_content = f"""
-        <h1>歡迎加入我們的會員！</h1>
-        <p>親愛的會員您好：</p>
-        <p>這是一封會員驗證信。</p>
-        
-        <p>您的註冊驗證碼為:{verify}</p>
-        
-        
-        </blockquote>
-        """
-    msg = EmailMultiAlternatives(subject, text_content, sender_email, [recipient_email])
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-    return "fin"
-
-
 def register(request):
+    user = None
     if request.method == "POST":
         postform = RegisterForm(request.POST)
-        if postform.is_valid():
+        print("測試開始")
+        is_exist_acc = False
+        is_exist_email = False
+        # 判斷email與acc是否唯一
+        if User.objects.filter(username=postform.data.get("acc")).count():
+            is_exist_acc = True
+        else:
+            is_exist_acc = False
+        if User.objects.filter(email=postform.data.get("email")).count():
+            is_exist_email = True
+        else:
+            is_exist_email = False
+        if postform.is_valid() and not is_exist_acc and not is_exist_email:
             username = postform.cleaned_data["username"]
             acc = postform.cleaned_data["acc"]
             pwd = postform.cleaned_data["pwd"]
             email = postform.cleaned_data["email"]
-
             tel = postform.cleaned_data["tel"]
+
             registerdate = timezone.now()
-            try:
-                user_img = postform.cleaned_data["user_img"]
-            except:
-                user_img = None
-            finally:
-                verify = ""  # 6位數驗證碼
-                for i in range(6):
-                    digi = random.randint(0, 9)
-                    verify += str(digi)
-                unit = User.objects.create(
-                    username=username,
-                    acc=acc,
-                    pwd=pwd,
-                    email=email,
-                    tel=tel,
-                    registerdate=registerdate,
-                    profile_pic=user_img,
-                    verify_code=verify,
-                )
+            registerdate = registerdate.strftime("%Y-%m-%d %H:%M:%S")
 
-                unit.save()
-                request.session["email"] = email
+            request.session["temp_username"] = username
+            request.session["temp_acc"] = acc
+            request.session["temp_pwd"] = pwd
+            request.session["temp_email"] = email
+            request.session["temp_tel"] = tel
+            request.session["temp_registerdate"] = registerdate
 
-                # user = None
-                return redirect("/verify/")
-                # return render(request, "verify.html", locals())
+            return redirect("/verify/")
+        else:
+            if is_exist_acc:
+                postform.errors["acc"] = "帳號已存在"
+            if is_exist_email:
+                postform.errors["email"] = "信箱地址已存在"
+            return render(request, "register.html", locals())
 
     else:
-
         user = None
         postform = RegisterForm()
     return render(request, "register.html", locals())
 
 
 def verify(request):
-    # send_verify(email, verify)
-    if "email" in request.session:
-        email = request.session["email"]
-        db_data = User.objects.get(email=email)
-        registerdate = db_data.registerdate
-        print(registerdate)
+    user = None
+    if "temp_email" in request.session:  # 有資料就會寄驗證信
+        print("有session")  # 測試
+        email = request.session["temp_email"]
+        verify = ""  # 6位數驗證碼
+        for i in range(6):
+            digi = random.randint(0, 9)
+            verify += str(digi)
+        request.session["verify"] = verify
         now = timezone.now()
-        print(now)
-        print(now - registerdate)
-        user = None
+        send_verify(email, verify)
 
-        try:
-            v_code = request.POST["v_code"]
-
-        except:
-            v_code = "N/A"
-
+        print(email, verify, now)
         return render(request, "verify.html", locals())
     else:
-        return render(request, "verify.html", locals())
+        print("沒有session")
+        return redirect("/register/")
+
+
+def check_ver(request):
+    user = None
+    if request.method == "POST":
+        verify_code = request.POST.get("v_code")
+        if verify_code == request.session["verify"]:
+            mess = "註冊成功"
+            unit = User.objects.create(
+                username=request.session["temp_username"],
+                acc=request.session["temp_acc"],
+                pwd=request.session["temp_pwd"],
+                email=request.session["temp_email"],
+                tel=request.session["temp_tel"],
+                registerdate=request.session["temp_registerdate"],
+            )
+
+            unit.save()
+            request.session.clear()
+            return render(request, "login.html", locals())
+        elif verify_code != request.session["verify"]:
+            mess = "驗證碼錯誤"
+            return render(request, "verify.html", locals())
 
 
 def login(request):
@@ -292,19 +314,14 @@ def logout(request):
 def show_movie_info(request, movieId):
     try:
         if "username" in request.session:
-            movieId = movieId
-            movie_info = Movie.objects.filter(id=movieId)
-            show_list = Show.objects.filter(movie_id=movieId)
-            text_info = TextBoard.objects.filter(tb_movie_id=movieId)
             user = request.session["username"]
-            return render(request, "movie_info.html", locals())
         else:
             user = None
-            movieId = movieId
-            movie_info = Movie.objects.filter(id=movieId)
-            show_list = Show.objects.filter(movie_id=movieId)
-            text_info = TextBoard.objects.filter(tb_movie_id=movieId)
-            return render(request, "movie_info.html", locals())
+        movieId = movieId
+        movie_info = Movie.objects.filter(id=movieId)
+        show_list = Show.objects.filter(movie_id=movieId)
+        text_info = TextBoard.objects.filter(tb_movie_id=movieId)
+        return render(request, "movie_info.html", locals())
     except:
         return redirect("/index/")
 
@@ -411,35 +428,57 @@ def update_theater(request):  # 暫時的，到時候跟電影資料上傳寫在
 def show_theater_list(request):
     if "username" in request.session:
         user = request.session["username"]
-        theater_list = Theater.objects.all()
-        return render(request, "theaterList.html", locals())
     else:
         user = None
-        theater_list = Theater.objects.all()
-        return render(request, "theaterList.html", locals())
+    theater_list = Theater.objects.all()
+    return render(request, "theaterList.html", locals())
 
 
 def show_theater(request, theaterName):
     if "username" in request.session:
         user = request.session["username"]
-        movie_title = (
-            Show.objects.filter(theater_name=theaterName)
-            .values_list("movie__title")
-            .distinct()
-        )
-        movie_title = [movie[0] for movie in movie_title]
-
-        return render(request, "theater.html", locals())
     else:
         user = None
-        movie_title = (
-            Show.objects.filter(theater_name=theaterName)
-            .values_list("movie__title")
-            .distinct()
-        )
-        movie_title = [movie[0] for movie in movie_title]
-        theaterName = theaterName
-        return render(request, "theater.html", locals())
+    movie_title = (
+        Show.objects.filter(theater_name=theaterName)
+        .values_list("movie__title")
+        .distinct()
+    )
+    movie_title = [movie[0] for movie in movie_title]
+    theaterName = theaterName
+
+    return render(request, "theater.html", locals())
+
+
+# 電影類型分類
+def show_type_list(request):
+    if "username" in request.session:
+        user = request.session["username"]
+    else:
+        user = None
+    type_list = []
+    temp_type_list = Movie.objects.all().values_list("type").distinct()
+    for type in temp_type_list:
+        for t in type[0].split("、"):
+            if "/" in t:
+                for y in t.split("/"):
+                    type_list.append(y)
+            else:
+                type_list.append(t)
+    type_list = set(type_list)
+    return render(request, "movieType.html", locals())
+
+
+# 電影類型資料呈現
+def show_type_movie(request, movieType):
+    if "username" in request.session:
+        user = request.session["username"]
+    else:
+        user = None
+    # '__contains':type欄位包含特定字段的資料
+    movielist = Movie.objects.filter(type__contains=movieType)
+
+    return render(request, "typeShowMovie.html", locals())
 
 
 def show_time(request, theaterName, movieName):

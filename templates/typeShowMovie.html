@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<table>
+    
+    
+{% for movie in movielist %}
+            
+    <tr>
+        <td>{{ movie.title }}<br>
+            {{ movie.title_en }}<br>
+            {{ movie.time }}<br>
+            {{ movie.release_date }}<br>
+            {{ movie.type }}<br>
+            {{ movie.director }}<br>
+            {{ movie.cast }}<br>
+            {{ movie.theater_name }}
+            <a href="/movie/{{ movie.id }}">連結</a>
+        </td>
+        <td><img src="{{ movie.img_src }}" width="400" height="400"></td>
+
+    </tr>
+{% endfor %}
+
+</table>
+{% endblock %}
