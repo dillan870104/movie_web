@@ -221,7 +221,7 @@ def register(request):
         is_exist_acc = False
         is_exist_email = False
         # 判斷email與acc是否唯一
-        if User.objects.filter(username=postform.data.get("acc")).count():
+        if User.objects.filter(acc=postform.data.get("acc")).count():
             is_exist_acc = True
         else:
             is_exist_acc = False
@@ -274,6 +274,9 @@ def verify(request):
         send_verify(email, verify)
 
         print(email, verify, now)
+        test = now.timetz()
+        print(test)
+
         return render(request, "verify.html", locals())
     else:
         print("沒有session")
@@ -300,7 +303,7 @@ def check_ver(request):
             return render(request, "login.html", locals())
         elif verify_code != request.session["verify"]:
             mess = "驗證碼錯誤"
-            return render(request, "verify.html", locals())
+            return redirect("/verify/")
 
 
 def login(request):
