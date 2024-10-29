@@ -4,4 +4,3 @@ django-heroku
 requests
 selenium
 bs4
-apscheduler
