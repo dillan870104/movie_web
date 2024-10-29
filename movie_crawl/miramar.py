@@ -6,16 +6,22 @@ from datetime import datetime
 def miramar_update():
     url = "https://www.miramarcinemas.tw/timetable"
     r = requests.get(url)
-    year = datetime.today().year #今年
+    year = datetime.today().year  # 今年
     now = datetime.today()
     now = now.date()
-    movie_level_list = ['badge_movie_level level_g','badge_movie_level level_p','badge_movie_level level_pg12','badge_movie_level level_pg15','badge_movie_level level_r']
+    movie_level_list = [
+        "badge_movie_level level_g",
+        "badge_movie_level level_p",
+        "badge_movie_level level_pg12",
+        "badge_movie_level level_pg15",
+        "badge_movie_level level_r",
+    ]
     if r.status_code == requests.codes.ok:
         soup = BeautifulSoup(r.text, "html.parser")
         movies = soup.find_all("div", class_="timetable_list row")
         miramarList = []
         for _movie in movies:  # 每一筆電影資料重複做一樣的事
-            
+
             bookingDates = _movie.find("div", "block booking_date_area").find_all("a")
             date = []  # 所有場次日期
             roomlist = []  # 所有廳 room
@@ -33,12 +39,12 @@ def miramar_update():
 
             title = _movie.find("div", class_="title").text
             title_en = _movie.find("div", class_="title_en").text
-            for level in movie_level_list: #判斷分級
+            for level in movie_level_list:  # 判斷分級
                 try:
-                    movie_level = _movie.find('div',class_=level).text
+                    movie_level = _movie.find("div", class_=level).text
                     break
                 except:
-                    movie_level = '未定'
+                    movie_level = "未定"
             imgSrc = _movie.find("img").get("src")
             time = _movie.find("p", class_="time").text
             movieDetail = "https://www.miramarcinemas.tw" + _movie.find(
@@ -58,9 +64,20 @@ def miramar_update():
                 .text.split("劇情簡介:")[-1]
                 .strip()
             )
-            
-            miramar = [title,title_en,time,imgSrc,releaseDate,genre,director,cast,assignment,movie_level]
 
+            miramar = [
+                title,
+                title_en,
+                time,
+                imgSrc,
+                releaseDate,
+                genre,
+                director,
+                cast,
+                assignment,
+                movie_level,
+            ]
+            print(miramar[0])
 
             # 每天的時間場次(正常情況)
             if len(tal) % tType == 0:
@@ -68,14 +85,14 @@ def miramar_update():
                     temp = []
                     temp += miramar  # 初始化場次以外的資料
                     today = date[int(i / tType)]
-                    
-                    today_str = str(year)+'年' + today #str版
-                    today_temp = datetime.strptime(today_str, "%Y年%m月%d日") #時間版
+
+                    today_str = str(year) + "年" + today  # str版
+                    today_temp = datetime.strptime(today_str, "%Y年%m月%d日")  # 時間版
                     if today_temp.date() < now:
                         year += 1
-                        today_str = str(year) + '年' + today
+                        today_str = str(year) + "年" + today
 
-                    today =  datetime.strptime(today_str, "%Y年%m月%d日").date()        
+                    today = datetime.strptime(today_str, "%Y年%m月%d日").date()
                     if tType == 1:
                         for j in tal[i]:
                             temp.append(today)
@@ -129,5 +146,5 @@ def miramar_update():
 
 
 if __name__ == "__main__":
-    miramarlist=miramar_update()
+    miramarlist = miramar_update()
     print(miramarlist)

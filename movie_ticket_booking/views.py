@@ -32,6 +32,7 @@ def send_verify(email, verify):
 
 
 # Create your views here.
+# 爬蟲
 def movie_update(request, cinemaName):  # 所有電影清單更新在這
     from movie_crawl import miramar, ambassador, miranewcinemas, vieshow, showtime
 
@@ -57,6 +58,11 @@ def movie_update(request, cinemaName):  # 所有電影清單更新在這
                     assignment=miramar_movie[8],
                     level=miramar_movie[9],
                 )
+            else:  # 新增一個判斷電影類型標籤的判斷，若沒有這個類型標籤就加上去
+                temp = Movie.objects.get(title=miramar_movie[0])
+                if miramar_movie[5] not in temp.type:
+                    temp.type = temp.type + "、" + miramar_movie[5]
+                    temp.save()
             # 存進show資料表
             Movie.objects.get(title=miramar_movie[0]).theater_movie.create(
                 theater_name="大直美麗華",
@@ -85,6 +91,11 @@ def movie_update(request, cinemaName):  # 所有電影清單更新在這
                     cast=ambassador_movie["Actors"],
                     assignment=ambassador_movie["Assignment"],
                 )
+            else:  # 新增一個判斷電影類型標籤的判斷，若沒有這個類型標籤就加上去
+                temp = Movie.objects.get(title=ambassador_movie["Movie (Chinese)"])
+                if ambassador_movie["Genre"] not in temp.type:
+                    temp.type = temp.type + "、" + ambassador_movie["Genre"]
+                    temp.save()
             # 存進show資料表
             if ambassador_movie["Assignment"] != []:
                 for showtime in ambassador_movie["Showtimes"]:
@@ -110,12 +121,20 @@ def movie_update(request, cinemaName):  # 所有電影清單更新在這
                     time=vieshow_movie[12],
                     img_src=vieshow_movie[10],
                     release_date=vieshow_movie[11],
-                    type=vieshow_movie[8],
+                    type=vieshow_movie[8].replace("/", "、"),
                     director=vieshow_movie[6],
                     cast=vieshow_movie[7],
                     assignment=vieshow_movie[9],
                     level=vieshow_movie[14],
                 )
+            else:  # 新增一個判斷電影類型標籤的判斷，若沒有這個類型標籤就加上去
+                temp = Movie.objects.get(title=vieshow_movie[0])
+
+                for t in vieshow_movie[8].replace("/", "、").split("、"):
+                    if t not in temp.type:
+                        temp.type = temp.type + "、" + t
+                        temp.save()
+
             # 存進show資料表
             Movie.objects.get(title=vieshow_movie[0]).theater_movie.create(
                 date=vieshow_movie[2],
@@ -147,15 +166,22 @@ def movie_update(request, cinemaName):  # 所有電影清單更新在這
                     title=showtime_movie["中文片名"],
                     title_en=showtime_movie["英文片名"],
                     time=showtime_movie["片長"],
-                    img_src="N/A",
+                    img_src=showtime_movie["圖片網址"],
                     release_date=showtime_movie["上映日"],
-                    type=showtime_movie["類型"],
+                    type=showtime_movie["類型"].replace("，", "、"),
                     director=showtime_movie["導演"],
                     cast=showtime_movie["演員"],
                     assignment=showtime_movie["簡介"],
                     level=showtime_movie["級別"],
                 )
+            else:  # 新增一個判斷電影類型標籤的判斷，若沒有這個類型標籤就加上去
+                temp = Movie.objects.get(title=showtime_movie["中文片名"])
+                for t in showtime_movie["類型"].replace("，", "、").split("、"):
+                    if t not in temp.type:
+                        temp.type = temp.type + "、" + t
+                        temp.save()
             # 存進show資料表
+            print(showtime_movie["日期"])
             Movie.objects.get(
                 title=showtime_movie["中文片名"],
             ).theater_movie.create(
@@ -167,6 +193,13 @@ def movie_update(request, cinemaName):  # 所有電影清單更新在這
             )
 
     return HttpResponse("電影資料更新完成")
+
+
+def del_show(request):
+    # unit = Show.objects.all()
+    unit = Show.objects.filter(theater_name__contains="秀泰")
+    unit.delete()
+    return HttpResponse("刪除完成")
 
 
 def movielist(request):
@@ -418,10 +451,25 @@ def del_fav(request, movieId):
 
 
 def update_theater(request):  # 暫時的，到時候跟電影資料上傳寫在一起
+    Theater.objects.all().delete()
     datas = Show.objects.all()
     for data in datas:
-        if len(Theater.objects.filter(name=data.theater_name)) == 0:
-            Theater.objects.create(name=data.theater_name, place=data.place)
+        if "秀泰" in data.theater_name:
+            if (
+                len(
+                    Theater.objects.filter(
+                        name=data.theater_name.split("秀泰")[0] + "秀泰"
+                    )
+                )
+                == 0
+            ):
+                Theater.objects.create(
+                    name=data.theater_name.split("秀泰")[0] + "秀泰", place=data.place
+                )
+        else:
+            if len(Theater.objects.filter(name=data.theater_name)) == 0:
+                Theater.objects.create(name=data.theater_name, place=data.place)
+
     return HttpResponse("影院資料更新完成")
 
 
