@@ -559,3 +559,7 @@ def show_time(request, theaterName, movieName):
             theater_name=theaterName, movie=Movie.objects.get(title=movieName)
         )
         return render(request, "theaterShow.html", locals())
+
+
+def hot_movie(request):
+    return render(request, "hot.html", locals())
