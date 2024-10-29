@@ -488,7 +488,7 @@ def show_theater(request, theaterName):
     else:
         user = None
     movie_title = (
-        Show.objects.filter(theater_name=theaterName)
+        Show.objects.filter(theater_name__contains=theaterName)
         .values_list("movie__title")
         .distinct()
     )
