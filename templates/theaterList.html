@@ -1,14 +1,136 @@
 {% extends 'base.html' %}
+<link rel="stylesheet" href="/static/css/style.css">
+{% block header %}
+<h1>全台影院</h1>
+<span class="subheading">按地區找影院</span>
+{% endblock %}
 {% block content %}
-<table>
-    {% for info in theater_list %}
-        
-    <tr>
-        <td><a href="/theater/{{ info.name }}"><h2>{{ info.name }}</h2></a>
-            {{ info.place }}
-        </td>
-    </tr>
+<div class="container px-4 px-lg-5">
+  <h2 class="text-center mt-0">電影區域</h2>
+  <hr class="divider" />
+<div class="selectArea">
+  <div class="drop">
+    <div class="dropOption">
+      <span>北部區域</span>
+    </div>
 
-{% endfor %}
-</table>
+    <ul class="dropdown">
+      {% for info in theater_north %}
+      {% if '台北' in info.place %}
+      <tr>
+          
+          <li><a href="/theater/{{ info.name }}">{{ info.name }} {{ info.place }}</a>
+              
+          </li>
+      {% endif %}
+      </tr>
+      {% endfor %}
+      
+    </ul>
+  </div>
+
+  <div class="drop">
+    <div class="dropOption">
+      <span>東部區域</span>
+    </div>
+
+    <ul class="dropdown">
+      {% for info in theater_east %}
+      <tr>
+          <li><a href="/theater/{{ info.name }}">{{ info.name }} {{ info.place }}</a>
+              
+          </li>
+      </tr>
+      {% endfor %}
+      
+    </ul>
+  </div>
+  <div class="drop">
+    <div class="dropOption">
+      <span>南部區域</span>
+    </div>
+
+    <ul class="dropdown">
+      {% for info in theater_south %}
+      <tr>
+          <li><a href="/theater/{{ info.name }}">{{ info.name }} {{ info.place }}</a>
+              
+          </li>
+      </tr>
+      {% endfor %}
+      
+    </ul>
+  </div>
+  <div class="drop">
+    <div class="dropOption">
+      <span>中部區域</span>
+    </div>
+
+    <ul class="dropdown">
+      {% for info in theater_west %}
+      <tr>
+          <li>
+            <a href="/theater/{{ info.name }}">{{ info.name }} {{ info.place }}</a>
+          </li>
+      </tr>
+      {% endfor %}
+      
+    </ul>
+  </div>
+</div>
+</div>
+
+<section class="page-section" id="services">
+  <div class="container px-4 px-lg-5">
+      <h2 class="text-center mt-0">所有影城</h2>
+      <hr class="divider" />
+      <div class="row gx-4 gx-lg-5">
+          <div class="col-lg-25 col-md-6 text-center">
+              <div class="mt-5">
+                  <div class="mb-2"></div>
+                  <h3 class="h4 mb-2">威秀影城</h3>
+                  {% for i in theater_vs %}
+                  <p class="place_theater"><a href="/theater/{{ i.name }}">{{ i.name }}</a></p>
+                  {% endfor %}
+              </div>
+          </div>
+          <div class="col-lg-25 col-md-6 text-center">
+              <div class="mt-5">
+                  <div class="mb-2"></div>
+                  <h3 class="h4 mb-2">秀泰影城</h3>
+                  {% for i in theater_st %}
+                  <p class="place_theater"><a href="/theater/{{ i.name }}">{{ i.name }}</a></p>
+                  {% endfor %}
+              </div>
+          </div>
+          <div class="col-lg-25 col-md-6 text-center">
+              <div class="mt-5">
+                  <div class="mb-2"></div>
+                  <h3 class="h4 mb-2">國賓影城</h3>
+                  {% for i in theater_ab %}
+                  <p class="place_theater"><a href="/theater/{{ i.name }}">{{ i.name }}</a></p>
+                  {% endfor %}
+              </div>
+          </div>
+          <div class="col-lg-25 col-md-6 text-center">
+              <div class="mt-5">
+                  <div class="mb-2"></div>
+                  <h3 class="h4 mb-2">美麗華影城</h3>
+                  {% for i in theater_mrm %}
+                  <p class="place_theater"><a href="/theater/{{ i.name }}">{{ i.name }}</a></p>
+                  {% endfor %}
+              </div>
+          </div>
+          <div class="col-lg-25 col-md-6 text-center">
+            <div class="mt-5">
+                <div class="mb-2"></div>
+                <h3 class="h4 mb-2">美麗新影城</h3>
+                {% for i in theater_mrn %}
+                  <p class="place_theater"><a href="/theater/{{ i.name }}">{{ i.name }}</a></p>
+                  {% endfor %}
+            </div>
+        </div>
+      </div>
+  </div>
+</section>
 {% endblock %}

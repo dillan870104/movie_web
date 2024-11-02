@@ -42,4 +42,5 @@ urlpatterns = [
     path("theater/<str:theaterName>/<str:movieName>", views.show_time),
     path("verify/", views.verify, name="verify"),
     path("check_ver/", views.check_ver),
+    path("test/", views.pre),
 ]

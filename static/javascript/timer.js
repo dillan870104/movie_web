@@ -1,7 +1,6 @@
-const emailBtn = document.querySelector(".emailBtn");
+const emailBtn = document.getElementById("emailBtn");
 const countdownClockTitle = document.querySelector(".countdownTitle");
 const submitBtn = document.getElementById("submitBtn")
-
 let countdown;
 const TIMER_DURATION = 20; // 計時器持續 30 秒
 
@@ -15,6 +14,7 @@ const startTimer = (inputSeconds) => {
     const endTime = Date.now() + inputSeconds * 1000;
 
     showTimer(inputSeconds);
+
 
     countdown = setInterval(() => {
         const timeLeft = Math.round((endTime - Date.now()) / 1000);
@@ -35,7 +35,7 @@ const resetTimerAndSendEmail = () => {
     clearInterval(countdown);
     startTimer(TIMER_DURATION);
     // 在此處添加重新寄送驗證信的邏輯，例如：
-    fetch("/verify/", { method: "GET" })
+    fetch("/verify", { method: "GET" })
         .then(response => {
             if (response.ok) {
                 alert("驗證信已重新寄送");
@@ -45,6 +45,9 @@ const resetTimerAndSendEmail = () => {
         })
         .catch(() => alert("已經寄送驗證碼"));
 };
-
+const email_error = () => {
+    alert("{{ email_msg }}");
+  }
 window.onload = () => startTimer(TIMER_DURATION);
+
 emailBtn.addEventListener("click", resetTimerAndSendEmail);

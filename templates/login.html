@@ -1,15 +1,45 @@
 {% extends 'base.html' %}
+{% block header %}
+<h1>登入</h1>
+<span class="subheading">登入帳號以解鎖更多功能</span>
+{% endblock %}
 {% block content %}
 
-<form action="/login/" method="POST">
-    {% csrf_token %}
-    
-    帳號:<input type="text" name="acc"/><br>        
-    密碼:<input type="password" name="pwd"/>
-    
-    <input type="submit" value="送出資料"/>
-</form>
-{{ mess }}<br>
 
+<section class="page-section" id="contact">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-lg-8 col-xl-6 text-center">
+                <h2 class="mt-0">登入</h2>
+                <hr class="divider" />
+                <p class="text-muted mb-5">{{ mess }}</p>
+            </div>
+        </div>
+        <div class="row gx-4 gx-lg-5 justify-content-center mb-5">
+            <div class="col-lg-6">
+                <form action="/login/" method="POST"id="contactForm">
+                    {% csrf_token %}
+                    <!-- acc input-->
+                    <div class="form-floating mb-3">
+                        <input class="form-control" name="acc" id="name" type="text" placeholder="Enter your account..." />
+                        <label for="name">Account</label>
+                    </div>
+                    <!-- Password address input-->
+                    <div class="form-floating mb-3">
+                        <input class="form-control" name="pwd" id="Password" type="Password" placeholder="Enter your password..." data-sb-validations="required,email" />
+                        <label for="Password">Password</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                    <div class="d-grid"><input type="submit" value="送出資料" class="btn btn-primary btn-xl"/></div>
+                    </div>
+                    
+                </form>
+                <!-- <div class="form-floating mb-3">
+                    <div class="d-grid"><button class="btn btn-primary btn-xl">忘記密碼</button></div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+</section>
 
 {% endblock %}

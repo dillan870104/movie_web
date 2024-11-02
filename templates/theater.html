@@ -1,18 +1,27 @@
 {% extends 'base.html' %}
+{% block header %}
+<h1>{{ theaterName }}</h1>
+<span class="subheading">當日電影</span>
+{% endblock %}
 {% block content %}
-<table>
-    
-    
-        {% for movie in movie_title %}
-            
-        <tr>
-            <td>
+
+<!-- Main Content-->
+<div id="trending" class="row">
+    <!-- 只顯示相框和資訊 -->
+    {% for movie in movie_playlist %}
+        <div class="col-md-3">
+            <div class="card">
+                <!-- 圖片和簡要資訊相框 -->
+                <a href="/theater/{{ theaterName }}/{{ movie.title }}">
+                    <img src="{{ movie.img_src }}" class="card-img-top" alt="{{ movie.title }}" >
                 
-                <a href="/theater/{{ theaterName }}/{{ movie }}" >{{ movie }}</a>
-            </td>
-        </tr>
-
-        {% endfor %}
-
-</table>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ movie.title }}</h5>
+                        <h6 class="card-text">{{ movie.release_date }}</h6>
+                    </div>
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}

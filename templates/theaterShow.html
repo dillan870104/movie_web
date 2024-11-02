@@ -1,20 +1,56 @@
 {% extends 'base.html' %}
+{% block header %}
+<h1>{{ theaterName }}</h1>
+<span class="subheading">{{ movieName }}</span>
+{% endblock %}
 {% block content %}
-<table>
-{% for date,type in movie_date %}
-    <tr>
-        <td><h4>{{ date }}</h4></td>
-    </tr>
-    {% for showtime in movie_showtime %}
-    <tr>
-        {% if showtime.date == date %}
-            <td>
-            {{ showtime.playTime }}
-            {{ showtime.roomType }}
-            </td>
+
+
+<!-- 電影資訊-->
+<section class="page-section" id="services">
+    <div class="container px-4 px-lg-5">
+        
+        
+        <div class="row gx-4 gx-lg-5">
+            <div class="col-lg-6 col-md-6 text-center">
+                <img class="float-end" src="{{ movie_obj.img_src }}" width="280" height="400">
+                
+            </div>
+            <div class="col-lg-6 col-md-6 text-center">
+                
+                    <h3 class="h4 mb-2">{{ movie_obj.title }}</h3>
+                    <h7 class="h7 mb-2">{{ movie_obj.title_en }}</h7>
+                    <hr class="divider"/>
+                    <p class="text-muted mb-0 text-start">導演 : {{ movie_obj.director }}</p>
+                    <p class="text-muted mb-0 text-start">演員 : {{ movie_obj.cast }}</p>
+                    <p class="text-muted mb-0 text-start">片長 : {{ movie_obj.time }}</p>
+            </div>
+        <hr class="divider mt-5"/>
+        <h2 class="text-center">電影簡介</h2>
+        <p class="text-muted mb-0 text-start">{{ movie_obj.assignment }}</p>    
+        <hr class="divider mt-5"/>
+        <h2 class="text-center">場次資訊</h2>
+        <table>
+        {% if movie_date %}
+            {% for date,type in movie_date %}
+                <tr class="text-center">
+                    <td><h5>{{ date }}</h5></td>
+                </tr>
+                {% for showtime in movie_showtime %}
+                <tr class="text-center mt-3">
+                    {% if showtime.date == date %}
+                    <td>
+                        <p class="text-muted my-xxl-0">{{ showtime.playTime }} {{ showtime.roomType }}</p>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            {% endfor %}
+            </table>
+        {% else %}
+        <h1 class="text-center">暫無場次</h2>
         {% endif %}
-    </tr>
-    {% endfor %}
-{% endfor %}
-</table>
+        </div>
+    </div>
+</section>
 {% endblock %}

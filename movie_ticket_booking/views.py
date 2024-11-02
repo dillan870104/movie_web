@@ -4,7 +4,22 @@ from movie_ticket_booking.models import User, Movie, Show, TextBoard, Favorite, 
 from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
 from movie_ticket_booking.form import RegisterForm
+from sklearn import svm
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+
 import random
+
+# 排程測試
+# from .task import (
+#     run_showtimes_task,
+#     run_vieshow_task,
+#     run_ambassador_task,
+#     run_miramar_task,
+#     run_miranewcinemas_task,
+# )
 
 
 # 寄送驗證信
@@ -265,6 +280,10 @@ def verify(request):
     if "temp_email" in request.session:  # 有資料就會寄驗證信
         print("有session")  # 測試
         email = request.session["temp_email"]
+        try:
+            email_msg = request.session["error_message"]
+        except:
+            email_msg = None
         verify = ""  # 6位數驗證碼
         for i in range(6):
             digi = random.randint(0, 9)
@@ -302,7 +321,7 @@ def check_ver(request):
             request.session.clear()
             return render(request, "login.html", locals())
         elif verify_code != request.session["verify"]:
-            mess = "驗證碼錯誤"
+
             return redirect("/verify/")
 
 
@@ -337,6 +356,7 @@ def login(request):
 
     else:
         user = None
+        mess = "請輸入您的帳號與密碼"
         return render(request, "login.html", locals())
 
 
@@ -481,7 +501,21 @@ def show_theater_list(request):
         user = request.session["username"]
     else:
         user = None
-    theater_list = Theater.objects.all()
+    theater_north, theater_west, theater_east, theater_south = [], [], [], []
+    for i in ["台北市", "新北市", "基隆市", "宜蘭縣", "桃園市", "新竹縣", "新竹市"]:
+        theater_north += Theater.objects.filter(place__contains=i)
+    for j in ["苗栗縣", "台中市", "彰化縣", "南投縣", "雲林縣"]:
+        theater_west += Theater.objects.filter(place__contains=j)
+    for k in ["花蓮縣", "台東縣"]:
+        theater_east += Theater.objects.filter(place__contains=k)
+    for l in ["嘉義縣", "嘉義市", "台南市", "高雄市", "屏東縣"]:
+        theater_south += Theater.objects.filter(place__contains=l)
+    theater_vs = Theater.objects.filter(name__contains="威秀")
+    theater_st = Theater.objects.filter(name__contains="秀泰")
+    theater_ab = Theater.objects.filter(name__contains="國賓")
+    theater_mrm = Theater.objects.filter(name__contains="美麗華")
+    theater_mrn = Theater.objects.filter(name__contains="美麗新")
+
     return render(request, "theaterList.html", locals())
 
 
@@ -490,12 +524,13 @@ def show_theater(request, theaterName):
         user = request.session["username"]
     else:
         user = None
-    movie_title = (
+    movie_obj = (
         Show.objects.filter(theater_name__contains=theaterName)
         .values_list("movie__title")
         .distinct()
     )
-    movie_title = [movie[0] for movie in movie_title]
+    movie_title = [movie[0] for movie in movie_obj]
+    movie_playlist = [Movie.objects.get(title=movie) for movie in movie_title]
     theaterName = theaterName
 
     return render(request, "theater.html", locals())
@@ -516,7 +551,13 @@ def show_type_list(request):
                     type_list.append(y)
             else:
                 type_list.append(t)
-    type_list = set(type_list)
+    type_list = list(set(type_list))
+    type_list_pic = []
+    for type in type_list:
+        type_list_pic.append(
+            [type, Movie.objects.filter(type__contains=type).order_by("?").first()]
+        )
+
     return render(request, "movieType.html", locals())
 
 
@@ -534,32 +575,135 @@ def show_type_movie(request, movieType):
 
 def show_time(request, theaterName, movieName):
     if "username" in request.session:
+
         user = request.session["username"]
-        movie_date = (
-            Show.objects.filter(
-                theater_name=theaterName, movie=Movie.objects.get(title=movieName)
-            )
-            .values_list("date", "roomType")
-            .distinct()
-        )
-        movie_showtime = Show.objects.filter(
-            theater_name=theaterName, movie=Movie.objects.get(title=movieName)
-        )
-        return render(request, "theaterShow.html", locals())
     else:
         user = None
-        movie_date = (
-            Show.objects.filter(
-                theater_name=theaterName, movie=Movie.objects.get(title=movieName)
-            )
-            .values_list("date", "roomType")
-            .distinct()
+    movie_date = (
+        Show.objects.filter(
+            theater_name__contains=theaterName, movie=Movie.objects.get(title=movieName)
         )
-        movie_showtime = Show.objects.filter(
-            theater_name=theaterName, movie=Movie.objects.get(title=movieName)
-        )
-        return render(request, "theaterShow.html", locals())
+        .values_list("date", "roomType")
+        .distinct()
+    )
+    movie_showtime = Show.objects.filter(
+        theater_name__contains=theaterName, movie=Movie.objects.get(title=movieName)
+    )
+    movie_obj = Movie.objects.get(title=movieName)
+    return render(request, "theaterShow.html", locals())
 
 
 def hot_movie(request):
+    if "username" in request.session:
+        user = request.session["username"]
+    else:
+        user = None
     return render(request, "hot.html", locals())
+
+
+def pre(request):
+    if "username" in request.session:
+        user = request.session["username"]
+        fav_list = Favorite.objects.filter(
+            fav_user=User.objects.get(acc=request.session["acc"])
+        )
+        fav_list = [fav.fav_movie.title for fav in fav_list]
+        mov_list = Movie.objects.all()
+        templist = []
+        mov_dict = {}
+        for mov in mov_list:
+            for fav in fav_list:
+                if fav == mov.title:
+                    templist.append(
+                        {
+                            "title": mov.title,
+                            "director": mov.director,
+                            "actors": mov.cast.strip("(配音)")
+                            .replace(",", "、")
+                            .split("、"),
+                            "genre": mov.type.replace("/", "、").split("、"),
+                            "liked": 1,
+                        }
+                    )
+
+                else:
+                    templist.append(
+                        {
+                            "title": mov.title,
+                            "director": mov.director,
+                            "actors": mov.cast.strip("(配音)")
+                            .replace(",", "、")
+                            .split("、"),
+                            "genre": mov.type.replace("/", "、").split("、"),
+                            "liked": 0,
+                        }
+                    )
+                break
+
+        # mov_dict = {"movies": templist}
+        # print(mov_dict)
+        # 使用者收藏的電影 (標示使用者喜愛的電影)
+        user_liked_movies = ["乒乓男孩", "台北追緝令"]
+
+        # Step 1: 建立特徵矩陣
+        all_genres = {genre for movie in templist for genre in movie["genre"]}
+        mlb_genres = MultiLabelBinarizer(classes=list(all_genres))
+
+        # SVM用
+        def extract_features(movie):
+            genre_vector = mlb_genres.fit_transform([movie["genre"]])[0]
+            director_vector = [hash(movie["director"]) % 1000]  # 將導演名稱雜湊化為數字
+            actors_vector = [
+                sum([hash(actor) % 1000 for actor in movie["actors"]])
+            ]  # 將演員名轉換為數字和
+            return list(genre_vector) + director_vector + actors_vector
+
+        X = [extract_features(movie) for movie in templist]  # 特徵矩陣
+        y = [
+            1 if movie["title"] in user_liked_movies else 0 for movie in templist
+        ]  # 標籤 (1: 喜愛, 0: 不喜愛)
+
+        # Step 2: 將資料分成訓練集與測試集
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42
+        )
+
+        # Step 3: 使用 SVM 建立分類模型
+        model = svm.SVC(kernel="linear", probability=True)
+        model.fit(X_train, y_train)
+
+        # Step 4: 預測測試集的結果
+        y_pred = model.predict(X_test)
+        print("測試集準確率:", accuracy_score(y_test, y_pred))
+
+        # Step 5: 預測使用者可能感興趣的電影
+        def predict_movie_interest(movie):
+            features = extract_features(movie)
+            prediction = model.predict([features])[0]
+            probability = model.predict_proba([features])[0][1]
+            return prediction, probability
+
+        # 測試預測
+        test_movie = {
+            "title": "乒乓男孩",
+            "genre": ["勵志", "劇情", "運動"],
+            "director": "洪伯豪",
+            "actors": ["徐若瑄", "鄭人碩", "施名帥", "彭裕愷", "李星緯"],
+        }
+        pred, prob = predict_movie_interest(test_movie)
+        print(f"預測結果: {'感興趣' if pred == 1 else '不感興趣'}, 機率: {prob:.2f}")
+
+        return HttpResponse(templist)
+    else:
+        user = None
+        return HttpResponse(user)
+    # df = pd.read_json()
+
+
+# def trigger_tasks(requst):
+#     run_showtimes_task(repeat=Task.DAILY,repeat_until=None)
+#     run_vieshow_task(repeat=Task.DAILY,repeat_until=None)
+#     run_moramar_task(repeat=Task.DAILY,repeat_until=None)
+#     run_miranewcinemas_task(repeat=Task.DAILY,repeat_until=None)
+#     run_ambassador_task(repeat=Task.DAILY,repeat_until=None)
+#     return HttpResponse("All task schedule")

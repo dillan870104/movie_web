@@ -1,28 +1,68 @@
 {% extends 'base.html' %}
+{% block script %}
+<style>
+.errorstyle{color:red;
+            font-weight:bold;
+}
+
+</style>
+{% endblock %}
+{% block header %}
+<h1>註冊</h1>
+<span class="subheading">註冊帳號來解鎖更多功能</span>
+{% endblock %}
 {% block content %}
-<!-- <form action="/register/" method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    姓名:<input type="text" name="username"/><br>
-    帳號:<input type="text" name="acc"/><br>
-    密碼:<input type="text" name="pwd"/><br>
-    email:<input type="text" name="email"/><br>
-    tel:<input type="text" name="tel"/><br>
-    大頭貼:<input type="file" name="user_img"/><br>
-    <input type="submit" value="送出資料"/>
-</form> -->
-<form action="/register/" method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <table border="1" cellspacing="1" cellpadding="4">
-        <p>姓名:{{ postform.username }}</p>
-        <p>帳號:{{ postform.acc }}{{ postform.errors.acc }}</p>
-        <p>密碼:{{ postform.pwd }}</p>
-        <p>email:{{ postform.email }}{{ postform.errors.email }}</p>
-        <p>tel:{{ postform.tel }}</p>
-        
-        <input type="submit" value="送出資料"/> <input type="reset" value="重設"/>
-    </table>
 
-</form>
+<section class="page-section" id="contact">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-lg-8 col-xl-6 text-center">
+                <h2 class="mt-0">註冊</h2>
+                <hr class="divider" />
+                <p class="text-muted mb-5">{{ mess }}</p>
+            </div>
+        </div>
+        <div class="row gx-4 gx-lg-5 justify-content-center mb-5">
+            <div class="col-lg-6">
+                <form action="/register/" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <!-- username input-->
+                    <div class="form-floating mb-3">
+                        {{ postform.username }}
+                        <label for="username">Username</label>
+                    </div>
+                    <!-- acc input-->
+                    <div class="form-floating mb-3">
+                        {{ postform.acc }}
+                        <small class="errorstyle">{{ postform.errors.acc }}</small>
+                        <label for="acc">Account</label>
+                    </div>
+                    <!-- Password input-->
+                    <div class="form-floating mb-3">
+                        {{ postform.pwd }}
+                        <label for="Passwordd">Password</label>
+                    </div>
+                    <!-- email input-->
+                    <div class="form-floating mb-3">
+                        {{ postform.email }}
+                        <small class="errorstyle">{{ postform.errors.email }}</small>
+                        <label for="email">email</label>
+                    </div>
+                    <!-- tel input-->
+                    <div class="form-floating mb-3">
+                        {{ postform.tel }}
+                        <small class="errorstyle">{{ postform.errors.tel }}</small>
+                        <label for="tel">tel</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                    <div class="d-grid"><input type="submit" value="送出資料" class="btn btn-primary btn-xl"/></div>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
 
-接收到的資料:{{ mess }}
+
 {% endblock %}  

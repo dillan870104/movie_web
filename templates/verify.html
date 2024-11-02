@@ -1,35 +1,48 @@
 {% extends 'base.html' %}
+{% block header %}
+<h1>驗證</h1>
+<span class="subheading">正在驗證您的信箱</span>
+{% endblock %}
 {% block content %}
 {% load static %}
 
-
-<section class="timer">
-    <div>
-        <form action="/check_ver/" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-        <table>
-            <tr>輸入驗證碼</tr>
-            <tr>
-                <td><input type="text" name="v_code"></td>
-            </tr>
-            <tr>
-                <td><input type="submit" value='送出' id='submitBtn'>
-                    <button class="emailBtn">獲取驗證信</button></td>        
-            </tr>
-        </table>
-        </form>
-        
-      
-      <h1 class="countdownTitle"></h1>
-    
+<section class="page-section" id="contact">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-lg-8 col-xl-6 text-center">
+                <h2 class="mt-0">輸入驗證碼</h2>
+                <hr class="divider" />
+                <p class="text-muted mb-5">{{ msg }}</p>
+            </div>
+        </div>
+        <div class="row gx-4 gx-lg-5 justify-content-center mb-5">
+            <div class="col-lg-6">
+                <form action="/check_ver/" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <!-- v_code input-->
+                    <div class="form-floating mb-3">
+                        <input class="form-control" name="v_code" type="text" placeholder="please input 6-digit verify code"/>
+                        <label for="v_code">六位數驗證碼</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <div class="d-grid"><input type="submit" value="送出" class="btn btn-primary btn-xl" id='submitBtn'/></div>
+                    </div>
+                    
+                </form>
+                <div class="form-floating mb-3">
+                    <div class="d-grid"><button class="btn btn-primary btn-xl" id="emailBtn">重新寄送驗證碼</button></div>
+                </div>
+                <h2 class="countdownTitle" style="text-align: center;"></h2>
+            </div>
+        </div>
     </div>
 </section>
-{{ now }}
+
+
 {% endblock %}
 {% block js_script %} 
-
 <script src="{% static 'javascript/timer.js' %}">
+
 </script>
-
-
+<!-- <script src="{% static 'javascript/check_code.js' %}"></script> -->
 {% endblock %}

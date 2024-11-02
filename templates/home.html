@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
+{% block header %}
+<h1>時光簾幕</h1>
+<span class="subheading">Screen Times</span>
+{% endblock %}
 {% block content %}
+
+
+<!-- Main Content-->
 <div id="trending" class="row">
     <!-- 只顯示相框和資訊 -->
     {% for movie in movielist %}
@@ -7,12 +14,13 @@
             <div class="card">
                 <!-- 圖片和簡要資訊相框 -->
                 <a href="/movie/{{ movie.id }}">
-                    <img src="{{ movie.img_src }}" class="card-img-top" alt="{{ movie.title }}">
+                    <img src="{{ movie.img_src }}" class="card-img-top" alt="{{ movie.title }}" >
+                
+                    <div class="card-body">
+                        <h5 class="card-title">{{ movie.title }}</h5>
+                        <h6 class="card-text">{{ movie.release_date }}</h6>
+                    </div>
                 </a>
-                <div class="card-body">
-                    <h5 class="card-title">{{ movie.title }}</h5>
-                    <p class="card-text">{{ movie.release_date }}</p>
-                </div>
             </div>
         </div>
     {% endfor %}

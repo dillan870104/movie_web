@@ -1,14 +1,26 @@
 {% extends 'base.html' %}
+{% block header %}
+<h1>所有電影類型</h1>
+<span class="subheading">按分類找你喜歡</span>
+{% endblock %}
 {% block content %}
-<table>
-    {% for type in type_list %}
-    
-    <tr>
-        <td><a href="/type/{{ type }}"><h2>{{ type }}</h2></a>
-            
-        </td>
-    </tr>
 
-{% endfor %}
-</table>
+<!-- Main Content-->
+<div id="trending" class="row">
+    <!-- 只顯示相框和資訊 -->
+    {% for type,type_obj in type_list_pic %}
+        <div class="col-md-3">
+            <div class="card">
+                <!-- 圖片和簡要資訊相框 -->
+                <a href="/type/{{ type }}">
+                    <img src="{{ type_obj.img_src }}" class="card-img-top"  >
+                
+                    <div class="card-body"> 
+                        <h5 class="card-title">{{ type }}</h5>  
+                    </div>
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}

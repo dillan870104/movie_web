@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "movie_ticket_booking",  # 新增的app
-    # "django_apscheduler", #排程
+    # "background_task", #排程
 ]
 
 MIDDLEWARE = [
