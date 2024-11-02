@@ -4,10 +4,11 @@ from movie_ticket_booking.models import User, Movie, Show, TextBoard, Favorite, 
 from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
 from movie_ticket_booking.form import RegisterForm
-from sklearn import svm
-from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+
+# from sklearn import svm
+# from sklearn.preprocessing import MultiLabelBinarizer
+# from sklearn.model_selection import train_test_split
+# from sklearn.metrics import accuracy_score
 
 
 import random
@@ -601,103 +602,104 @@ def hot_movie(request):
     return render(request, "hot.html", locals())
 
 
-def pre(request):
-    if "username" in request.session:
-        user = request.session["username"]
-        fav_list = Favorite.objects.filter(
-            fav_user=User.objects.get(acc=request.session["acc"])
-        )
-        fav_list = [fav.fav_movie.title for fav in fav_list]
-        mov_list = Movie.objects.all()
-        templist = []
-        mov_dict = {}
-        for mov in mov_list:
-            for fav in fav_list:
-                if fav == mov.title:
-                    templist.append(
-                        {
-                            "title": mov.title,
-                            "director": mov.director,
-                            "actors": mov.cast.strip("(配音)")
-                            .replace(",", "、")
-                            .split("、"),
-                            "genre": mov.type.replace("/", "、").split("、"),
-                            "liked": 1,
-                        }
-                    )
+# def pre(request):
+#     if "username" in request.session:
+#         user = request.session["username"]
+#         fav_list = Favorite.objects.filter(
+#             fav_user=User.objects.get(acc=request.session["acc"])
+#         )
+#         fav_list = [fav.fav_movie.title for fav in fav_list]
+#         mov_list = Movie.objects.all()
+#         templist = []
+#         mov_dict = {}
+#         for mov in mov_list:
+#             for fav in fav_list:
+#                 if fav == mov.title:
+#                     templist.append(
+#                         {
+#                             "title": mov.title,
+#                             "director": mov.director,
+#                             "actors": mov.cast.strip("(配音)")
+#                             .replace(",", "、")
+#                             .split("、"),
+#                             "genre": mov.type.replace("/", "、").split("、"),
+#                             "liked": 1,
+#                         }
+#                     )
 
-                else:
-                    templist.append(
-                        {
-                            "title": mov.title,
-                            "director": mov.director,
-                            "actors": mov.cast.strip("(配音)")
-                            .replace(",", "、")
-                            .split("、"),
-                            "genre": mov.type.replace("/", "、").split("、"),
-                            "liked": 0,
-                        }
-                    )
-                break
+#                 else:
+#                     templist.append(
+#                         {
+#                             "title": mov.title,
+#                             "director": mov.director,
+#                             "actors": mov.cast.strip("(配音)")
+#                             .replace(",", "、")
+#                             .split("、"),
+#                             "genre": mov.type.replace("/", "、").split("、"),
+#                             "liked": 0,
+#                         }
+#                     )
+#                 break
 
-        # mov_dict = {"movies": templist}
-        # print(mov_dict)
-        # 使用者收藏的電影 (標示使用者喜愛的電影)
-        user_liked_movies = ["乒乓男孩", "台北追緝令"]
+#         # mov_dict = {"movies": templist}
+#         # print(mov_dict)
+#         # 使用者收藏的電影 (標示使用者喜愛的電影)
+#         user_liked_movies = ["乒乓男孩", "台北追緝令"]
 
-        # Step 1: 建立特徵矩陣
-        all_genres = {genre for movie in templist for genre in movie["genre"]}
-        mlb_genres = MultiLabelBinarizer(classes=list(all_genres))
+#         # Step 1: 建立特徵矩陣
+#         all_genres = {genre for movie in templist for genre in movie["genre"]}
+#         mlb_genres = MultiLabelBinarizer(classes=list(all_genres))
 
-        # SVM用
-        def extract_features(movie):
-            genre_vector = mlb_genres.fit_transform([movie["genre"]])[0]
-            director_vector = [hash(movie["director"]) % 1000]  # 將導演名稱雜湊化為數字
-            actors_vector = [
-                sum([hash(actor) % 1000 for actor in movie["actors"]])
-            ]  # 將演員名轉換為數字和
-            return list(genre_vector) + director_vector + actors_vector
+#         # SVM用
+#         def extract_features(movie):
+#             genre_vector = mlb_genres.fit_transform([movie["genre"]])[0]
+#             director_vector = [hash(movie["director"]) % 1000]  # 將導演名稱雜湊化為數字
+#             actors_vector = [
+#                 sum([hash(actor) % 1000 for actor in movie["actors"]])
+#             ]  # 將演員名轉換為數字和
+#             return list(genre_vector) + director_vector + actors_vector
 
-        X = [extract_features(movie) for movie in templist]  # 特徵矩陣
-        y = [
-            1 if movie["title"] in user_liked_movies else 0 for movie in templist
-        ]  # 標籤 (1: 喜愛, 0: 不喜愛)
+#         X = [extract_features(movie) for movie in templist]  # 特徵矩陣
+#         y = [
+#             1 if movie["title"] in user_liked_movies else 0 for movie in templist
+#         ]  # 標籤 (1: 喜愛, 0: 不喜愛)
 
-        # Step 2: 將資料分成訓練集與測試集
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42
-        )
+#         # Step 2: 將資料分成訓練集與測試集
+#         X_train, X_test, y_train, y_test = train_test_split(
+#             X, y, test_size=0.2, random_state=42
+#         )
 
-        # Step 3: 使用 SVM 建立分類模型
-        model = svm.SVC(kernel="linear", probability=True)
-        model.fit(X_train, y_train)
+#         # Step 3: 使用 SVM 建立分類模型
+#         model = svm.SVC(kernel="linear", probability=True)
+#         model.fit(X_train, y_train)
 
-        # Step 4: 預測測試集的結果
-        y_pred = model.predict(X_test)
-        print("測試集準確率:", accuracy_score(y_test, y_pred))
+#         # Step 4: 預測測試集的結果
+#         y_pred = model.predict(X_test)
+#         print("測試集準確率:", accuracy_score(y_test, y_pred))
 
-        # Step 5: 預測使用者可能感興趣的電影
-        def predict_movie_interest(movie):
-            features = extract_features(movie)
-            prediction = model.predict([features])[0]
-            probability = model.predict_proba([features])[0][1]
-            return prediction, probability
+#         # Step 5: 預測使用者可能感興趣的電影
+#         def predict_movie_interest(movie):
+#             features = extract_features(movie)
+#             prediction = model.predict([features])[0]
+#             probability = model.predict_proba([features])[0][1]
+#             return prediction, probability
 
-        # 測試預測
-        test_movie = {
-            "title": "乒乓男孩",
-            "genre": ["勵志", "劇情", "運動"],
-            "director": "洪伯豪",
-            "actors": ["徐若瑄", "鄭人碩", "施名帥", "彭裕愷", "李星緯"],
-        }
-        pred, prob = predict_movie_interest(test_movie)
-        print(f"預測結果: {'感興趣' if pred == 1 else '不感興趣'}, 機率: {prob:.2f}")
+#         # 測試預測
+#         test_movie = {
+#             "title": "乒乓男孩",
+#             "genre": ["勵志", "劇情", "運動"],
+#             "director": "洪伯豪",
+#             "actors": ["徐若瑄", "鄭人碩", "施名帥", "彭裕愷", "李星緯"],
+#         }
+#         pred, prob = predict_movie_interest(test_movie)
+#         print(f"預測結果: {'感興趣' if pred == 1 else '不感興趣'}, 機率: {prob:.2f}")
 
-        return HttpResponse(templist)
-    else:
-        user = None
-        return HttpResponse(user)
-    # df = pd.read_json()
+#         return HttpResponse(templist)
+#     else:
+#         user = None
+#         return HttpResponse(user)
+
+# df = pd.read_json()
 
 
 # def trigger_tasks(requst):
