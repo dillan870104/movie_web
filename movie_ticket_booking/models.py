@@ -10,9 +10,8 @@ class User(models.Model):
     username = models.CharField(max_length=20, null=False)
     registerdate = models.DateTimeField()
     tel = models.CharField(max_length=10)
+    admin_id = models.BooleanField(default=False)
     # profile_pic = models.ImageField(upload_to="static/images")
-    # verify_code = models.CharField(max_length=6, default=None)
-    # verify_state = models.BooleanField(default=False)
 
     class Meta:
         db_table = "User"

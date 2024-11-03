@@ -41,7 +41,11 @@
                     <!-- <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/hot">電影熱映</a></li> -->
                     <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/type">類型</a></li>
                     <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/theater">影城</a></li>
+                    {% if admin %}
+                    <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/db_control">更新場次資料</a></li>
+                    {% else %}
                     <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="/favorite">收藏清單</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -69,7 +73,7 @@
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
                         <ul class="list-inline text-center">
-                            <li class="list-inline-item">
+                            <!-- <li class="list-inline-item">
                                 <a href="#!">
                                     <span class="fa-stack fa-lg">
                                         <i class="fas fa-circle fa-stack-2x"></i>
@@ -92,7 +96,7 @@
                                         <i class="fab fa-github fa-stack-1x fa-inverse"></i>
                                     </span>
                                 </a>
-                            </li>
+                            </li> -->
                         </ul>
                         <div class="small text-center text-muted fst-italic">Copyright &copy; Screen Times 2024</div>
                     </div>

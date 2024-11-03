@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block header %}
+<h1>管理</h1>
+<span class="subheading">管理資料</span>
+{% endblock %}
+{% block content %}
+<section class="page-section" id="contact">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-lg-8 col-xl-8 text-center my-2">
+                <h2 class="my-2">新增電影院場次</h2>
+                <hr class="divider"/>
+                <a href="/update/showtime" class="btn btn-dark">新增秀泰資料</a>
+                <a href="/update/vieshow" class="btn btn-dark">新增威秀資料</a>
+                <a href="/update/ambassador" class="btn btn-dark">新增國賓資料</a>
+                <a href="/update/miramar" class="btn btn-dark">新增美麗華資料</a>
+                <a href="/update/miranew" class="btn btn-dark">新增美麗新資料</a>
+
+            </div>
+        </div>
+    </div>
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-lg-8 col-xl-10 text-center my-2">
+                <h2 class="my-2">刪除電影院場次</h2>
+                <hr class="divider"/>
+                <a href="/delete/秀泰" class="btn btn-dark">刪除秀泰資料</a>
+                <a href="/delete/威秀" class="btn btn-dark">刪除威秀資料</a>
+                <a href="/delete/國賓" class="btn btn-dark">刪除國賓資料</a>
+                <a href="/delete/美麗華" class="btn btn-dark">刪除美麗華資料</a>
+                <a href="/delete/美麗新" class="btn btn-dark">刪除美麗新資料</a>
+                <a href="/delete/all" class="btn btn-dark">刪除所有場次資料</a>
+            </div>
+            
+                
+            
+        </div>
+    </div>
+</section>
+{% endblock %}

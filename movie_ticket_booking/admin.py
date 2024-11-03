@@ -19,6 +19,7 @@ class userAdmin(admin.ModelAdmin):
         "username",
         "registerdate",
         "tel",
+        "admin_id",
     )
 
 

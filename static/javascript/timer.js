@@ -2,7 +2,7 @@ const emailBtn = document.getElementById("emailBtn");
 const countdownClockTitle = document.querySelector(".countdownTitle");
 const submitBtn = document.getElementById("submitBtn")
 let countdown;
-const TIMER_DURATION = 20; // 計時器持續 30 秒
+const TIMER_DURATION = 300; // 計時器持續 30 秒
 
 const showTimer = (seconds) => {
     const minutes = Math.floor(seconds / 60);

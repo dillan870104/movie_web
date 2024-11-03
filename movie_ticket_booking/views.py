@@ -48,8 +48,24 @@ def send_verify(email, verify):
 
 
 # Create your views here.
+# 管理者管理資料
+def db_control(request):
+    user = request.session["username"]
+    admin = request.session["admin"]
+
+    if admin:
+        return render(request, "admin.html", locals())
+    else:
+        user = None
+        admin = None
+        return render(request, "login.html", locals())
+
+
 # 爬蟲
 def movie_update(request, cinemaName):  # 所有電影清單更新在這
+    user = request.session["username"]
+    admin = request.session["admin"]
+    mess = ""
     from movie_crawl import miramar, ambassador, miranewcinemas, vieshow, showtime
 
     # 爬蟲
@@ -207,30 +223,41 @@ def movie_update(request, cinemaName):  # 所有電影清單更新在這
                 theater_name=showtime_movie["影廳"],
                 place=showtime_movie["影院位置"],
             )
+        mess = f"{cinemaName}資料更新完成"
 
-    return HttpResponse("電影資料更新完成")
+    return redirect("/db_control/")
+    # return HttpResponse("電影資料更新完成")
 
 
-def del_show(request):
+def del_show(request, theaterName):
     # unit = Show.objects.all()
-    unit = Show.objects.filter(theater_name__contains="秀泰")
-    unit.delete()
-    return HttpResponse("刪除完成")
+    if theaterName == "all":
+        unit = Show.objects.all()
+        unit.delete()
+    else:
+        unit = Show.objects.filter(theater_name__contains=theaterName)
+        unit.delete()
+
+    mess = f"{theaterName} 刪除完成"
+    return redirect("/db_control/")
 
 
 def movielist(request):
     try:
         movielist = Movie.objects.all()
         user = request.session["username"]
+        admin = request.session["admin"]
         return render(request, "home.html", locals())
     except:
         movielist = Movie.objects.all()
         user = None
+        admin = None
         return render(request, "home.html", locals())
 
 
 def register(request):
     user = None
+    admin = None
     if request.method == "POST":
         postform = RegisterForm(request.POST)
         print("測試開始")
@@ -272,12 +299,14 @@ def register(request):
 
     else:
         user = None
+        admin = None
         postform = RegisterForm()
     return render(request, "register.html", locals())
 
 
 def verify(request):
     user = None
+    admin = None
     if "temp_email" in request.session:  # 有資料就會寄驗證信
         print("有session")  # 測試
         email = request.session["temp_email"]
@@ -305,6 +334,7 @@ def verify(request):
 
 def check_ver(request):
     user = None
+    admin = None
     if request.method == "POST":
         verify_code = request.POST.get("v_code")
         if verify_code == request.session["verify"]:
@@ -328,6 +358,7 @@ def check_ver(request):
 
 def login(request):
     user = None
+    admin = None
     if request.method == "POST":
         acc = request.POST["acc"]
         pwd = request.POST["pwd"]
@@ -341,22 +372,28 @@ def login(request):
                 request.session["acc"] = db_data.acc
                 request.session["pwd"] = db_data.pwd
                 request.session["username"] = db_data.username
+                request.session["admin"] = db_data.admin_id
+
                 return redirect("/index/")
             elif db_data.pwd != pwd:
                 mess = "密碼錯誤"
                 user = None
+                admin = None
                 return render(request, "login.html", locals())
             else:
                 mess = "錯誤，請重新輸入"
                 user = None
+                admin = None
                 return render(request, "login.html", locals())
         except:
             mess = "沒有此帳號，請重新輸入"
             user = None
+            admin = None
             return render(request, "login.html", locals())
 
     else:
         user = None
+        admin = None
         mess = "請輸入您的帳號與密碼"
         return render(request, "login.html", locals())
 
@@ -372,8 +409,10 @@ def show_movie_info(request, movieId):
     try:
         if "username" in request.session:
             user = request.session["username"]
+            admin = request.session["admin"]
         else:
             user = None
+            admin = None
         movieId = movieId
         movie_info = Movie.objects.get(id=movieId)
 
@@ -390,6 +429,7 @@ def leave_comment(request, movieId):  # 留言板功能
     movie_info = Movie.objects.get(id=movieId)
     if "username" in request.session:
         user = request.session["username"]
+        admin = request.session["admin"]
         if request.method == "POST":
 
             movieId = request.POST["id"]
@@ -410,6 +450,7 @@ def leave_comment(request, movieId):  # 留言板功能
 
     else:
         user = None
+        admin = None
         mess = "請先登入"
         return render(request, "login.html", locals())
 
@@ -417,6 +458,7 @@ def leave_comment(request, movieId):  # 留言板功能
 def show_fav(request):  # 我的最愛
     if "username" in request.session:
         user = request.session["username"]
+        admin = request.session["admin"]
         try:
             fav_list = Favorite.objects.filter(
                 fav_user=User.objects.get(acc=request.session["acc"])
@@ -428,6 +470,7 @@ def show_fav(request):  # 我的最愛
     else:
         mess = "請先登入"
         user = None
+        admin = None
         return render(request, "login.html", locals())
 
 
@@ -458,6 +501,7 @@ def add_fav(request, movieId):
     else:
         mess = "請先登入"
         user = None
+        admin = None
         return render(request, "login.html", locals())
 
 
@@ -504,8 +548,10 @@ def update_theater(request):  # 暫時的，到時候跟電影資料上傳寫在
 def show_theater_list(request):
     if "username" in request.session:
         user = request.session["username"]
+        admin = request.session["admin"]
     else:
         user = None
+        admin = None
     theater_north, theater_west, theater_east, theater_south = [], [], [], []
     for i in ["台北市", "新北市", "基隆市", "宜蘭縣", "桃園市", "新竹縣", "新竹市"]:
         theater_north += Theater.objects.filter(place__contains=i)
@@ -527,8 +573,10 @@ def show_theater_list(request):
 def show_theater(request, theaterName):
     if "username" in request.session:
         user = request.session["username"]
+        admin = request.session["admin"]
     else:
         user = None
+        admin = None
     movie_obj = (
         Show.objects.filter(theater_name__contains=theaterName)
         .values_list("movie__title")
@@ -545,8 +593,10 @@ def show_theater(request, theaterName):
 def show_type_list(request):
     if "username" in request.session:
         user = request.session["username"]
+        admin = request.session["admin"]
     else:
         user = None
+        admin = None
     type_list = []
     temp_type_list = Movie.objects.all().values_list("type").distinct()
     for type in temp_type_list:
@@ -554,15 +604,20 @@ def show_type_list(request):
             if "/" in t:
                 for y in t.split("/"):
                     type_list.append(y)
+            elif t == "":
+                continue
             else:
                 type_list.append(t)
+    # print(type_list)
     type_list = list(set(type_list))
     type_list_pic = []
+    # print("//////")
     for type in type_list:
         type_list_pic.append(
             [type, Movie.objects.filter(type__contains=type).order_by("?").first()]
         )
-
+        # print(type)
+    # print(type_list_pic)
     return render(request, "movieType.html", locals())
 
 
@@ -570,8 +625,10 @@ def show_type_list(request):
 def show_type_movie(request, movieType):
     if "username" in request.session:
         user = request.session["username"]
+        admin = request.session["admin"]
     else:
         user = None
+        admin = None
     # '__contains':type欄位包含特定字段的資料
     movielist = Movie.objects.filter(type__contains=movieType)
     movieType = movieType
@@ -582,8 +639,10 @@ def show_time(request, theaterName, movieName):
     if "username" in request.session:
 
         user = request.session["username"]
+        admin = request.session["admin"]
     else:
         user = None
+        admin = None
     movie_date = (
         Show.objects.filter(
             theater_name__contains=theaterName, movie=Movie.objects.get(title=movieName)
@@ -601,8 +660,10 @@ def show_time(request, theaterName, movieName):
 def hot_movie(request):
     if "username" in request.session:
         user = request.session["username"]
+        admin = request.session["admin"]
     else:
         user = None
+        admin = None
     return render(request, "hot.html", locals())
 
 

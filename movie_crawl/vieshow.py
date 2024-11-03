@@ -68,7 +68,8 @@ def fetch_movie_data(page_count=3):
                 # 濾掉沒有標題或不相關的條目
                 if title.get("title") is None or "下載最新版" in title.get("title"):
                     continue
-
+                if "現場直播" in title.get("title"):  # 先把直播的資料過濾掉
+                    continue
                 print(f'電影標題: {title.get("title")}')
 
                 # 嘗試使用 GET 請求來獲取電影詳細資訊

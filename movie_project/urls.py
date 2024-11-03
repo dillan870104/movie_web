@@ -24,9 +24,10 @@ urlpatterns = [
     path("", views.movielist),
     path("index/", views.movielist),
     path("hot/", views.hot_movie),
+    path("db_control/", views.db_control),
     path("update/<str:cinemaName>", views.movie_update),
     path("update_theater/", views.update_theater),  # 暫時的
-    path("delete/", views.del_show),  # 暫時的
+    path("delete/<str:theaterName>", views.del_show),  # 暫時的
     path("movie/<int:movieId>", views.show_movie_info),
     path("comment/<int:movieId>", views.leave_comment),
     path("register/", views.register),
