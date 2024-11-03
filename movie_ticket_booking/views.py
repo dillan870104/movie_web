@@ -374,7 +374,7 @@ def login(request):
                 request.session["username"] = db_data.username
                 request.session["admin"] = db_data.admin_id
 
-                return redirect("/index/")
+                return redirect("/")
             elif db_data.pwd != pwd:
                 mess = "密碼錯誤"
                 user = None
@@ -402,7 +402,7 @@ def logout(request):
 
     request.session.clear()
 
-    return redirect("/index/")
+    return redirect("/")
 
 
 def show_movie_info(request, movieId):
@@ -422,7 +422,7 @@ def show_movie_info(request, movieId):
         return render(request, "movie_info.html", locals())
     except Exception as e:
         # print(e)
-        return redirect("/index/")
+        return redirect("/")
 
 
 def leave_comment(request, movieId):  # 留言板功能
