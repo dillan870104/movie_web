@@ -1,16 +1,37 @@
 {% extends 'base.html' %}
+{% block header %}
+<h1>{{ movie_info.title }}</h1>
+<span class="subheading">{{ movie_info.title_en }}</span>
+{% endblock %}
 {% block content %}
-<table>
-    {% for info in movie_info %}
-    電影名稱:{{ info.title }}<br>
-    
-    <form action="./{{ info.id }}" method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <input type="hidden" name="id" value="{{ info.id }}">
-        留言:<input type="text" name="comment"/><br>
-        <input type="submit" value="送出留言"/>
-    </form>
-    {% endfor %}
-</table>
+
+<section class="page-section" id="contact">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-lg-8 col-xl-6 text-center">
+                <h2 class="mt-0">電影名稱:{{ movie_info.title }}</h2>
+                <hr class="divider" />
+                <p class="text-muted mb-5">{{ mess }}</p>
+            </div>
+        </div>
+        <div class="row gx-4 gx-lg-5 justify-content-center mb-5">
+            <div class="col-lg-6">
+                <form action="./{{ movie_info.id }}" method="POST"id="contactForm">
+                    {% csrf_token %}
+                    <!-- id input-->
+                    <input type="hidden" name="id" value="{{ movie_info.id }}">
+                    <!-- Password address input-->
+                    <div class="form-floating mb-3">
+                        <input class="form-control" name="comment" id="comment" placeholder="Enter your comment..." />
+                        <label for="comment">Comment</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                    <div class="d-grid"><input type="submit" value="送出評論" class="btn btn-primary btn-xl"/></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
 {% endblock %}

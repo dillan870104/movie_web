@@ -1,62 +1,77 @@
 {% extends 'base.html' %}
+{% block header %}
+<h1>{{ movie_info.title }}</h1>
+<span class="subheading">{{ movie_info.title_en }}</span>
+{% endblock %}
+
 {% block content %}
-{% if movie_info %}
-<table>
-    <tr>
-        <th>電影</th>
-        <th></th>
-        
-        
-    </tr>
-    {% for info in movie_info %}
-        
-        <tr>
-            <td>{{ info.title }}<br>
-                {{ info.title_en }}<br>
-                {{ info.time }}<br>
-                {{ info.release_date }}<br>
-                {{ info.type }}<br>
-                {{ info.director }}<br>
-                {{ info.cast }}<br>
-                
 
-            </td>
-            <td><img src="{{ info.img_src }}" width="400" height="400">  
+<!-- 電影資訊-->
+<section class="page-section" id="services">
+    <div class="container px-4 px-lg-5">
         
-                <a href="/comment/{{ info.id }}">我要留言</a> <a href="/favorite/add/{{ info.id }}">加入我的最愛</a>
-                
-                <a href='/'>回上一頁</a>
-            </td>
-        </tr>
-    {% endfor %}
 
-</table>
-{% endif %}
-<!-- {% if show_list %}
-<h1>這是場次資訊</h1>
-<table>
-{% for show in show_list %}
-<tr>
-    <td>{{ show.date }}
-        {{ show.roomType }}
-        {{ show.playTime }}
-        {{ show.theater_name }}<br>
-    </td>
-</tr>
-{% endfor %}
-</table>
-{% endif %} -->
-<h1>留言板</h1>
+        <div class="row gx-4 gx-lg-5">
+            <div class="col-lg-6 col-md-6 text-center">
+                <img class="float-end" src="{{ movie_info.img_src }}" width="280" height="400">
+                
+            </div>
+            <div class="col-lg-6 col-md-6">
+                
+                <h3 class="h4 mb-2 text-start">{{ movie_info.title }}</h3>
+                <h4 class="h7 mb-2 text-start">{{ movie_info.title_en }}</h7>
+                <hr class="divider"/>
+                <p class="text-muted my-3 text-start" style="font-size: 20px;">導演 : {{ movie_info.director }}</p>
+                <p class="text-muted my-3 text-start" style="font-size: 20px;">演員 : {{ movie_info.cast }}</p>
+                <p class="text-muted my-3 text-start" style="font-size: 20px;">片長 : {{ movie_info.time }}</p>
+                <p class="text-muted my-3 text-start" style="font-size: 20px;">分級 : {{ movie_info.level }}</p>
+                <p class="text-muted my-3 text-start" style="font-size: 20px;">類型 : {{ movie_info.type }}</p>
+                <div class="row gx-4 gx-lg-5 mt-5">
+                    <div class="col-lg-4 col-md-6 text-center">
+                    <a href="/comment/{{ movie_info.id }}" class="btn btn-dark">我要留言</a>
+                    </div>
+                    <div class="col-lg-4 col-md-6 text-center">
+                    <a href="/favorite/add/{{ movie_info.id }}" class="btn btn-dark">加入我的最愛</a>
+                    </div>          
+                </div>
+            </div>
+                    
+        <hr class="divider mt-5"/>
+        <h2 class="text-center">電影簡介</h2>
+        <p class="text-muted mb-0 text-start">{{ movie_info.assignment }}</p>    
+        <hr class="divider mt-5"/>
+
+    </div>
+</section>
+<hr class="divider mt-5"/>
+<h2 class="text-center">留言</h2>
+
+
+
+
 {% if text_info %}
-
-<table>
-    {% for text in text_info %}
-    <tr>
-        <td>{{ text.tb_user }} : {{ text.content }}
-            <br>
-        </td>
-    </tr>
-    {% endfor %}
-    </table>
+<!-- Main Content-->
+<div class="container px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-7">
+            
+            {% for text in text_info %}
+            <!-- Post preview-->
+            <div class="post-preview">
+                <h3 class="post-subtitle">{{ text.tb_user }}</h3>
+                <h5 class="post-meta">{{ text.content }}</h5>
+                <p class="post-meta text-end">{{ text.comment_time }}</p>
+            </div>
+            <!-- Divider-->
+            <hr class="my-4" />
+            
+            {% endfor %}
+            {% else %}
+            <div class="post-preview">
+                <h2 style="text-align: center;">尚未加入電影</h2>
+            </div>
+        </div>
+    </div>
+</div>
 {% endif %}
 {% endblock %}

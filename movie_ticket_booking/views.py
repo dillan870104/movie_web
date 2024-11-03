@@ -375,16 +375,19 @@ def show_movie_info(request, movieId):
         else:
             user = None
         movieId = movieId
-        movie_info = Movie.objects.filter(id=movieId)
+        movie_info = Movie.objects.get(id=movieId)
+
         show_list = Show.objects.filter(movie_id=movieId)
         text_info = TextBoard.objects.filter(tb_movie_id=movieId)
+        mess = "你的評論"
         return render(request, "movie_info.html", locals())
-    except:
+    except Exception as e:
+        # print(e)
         return redirect("/index/")
 
 
 def leave_comment(request, movieId):  # 留言板功能
-    movie_info = Movie.objects.filter(id=movieId)
+    movie_info = Movie.objects.get(id=movieId)
     if "username" in request.session:
         user = request.session["username"]
         if request.method == "POST":
@@ -418,6 +421,7 @@ def show_fav(request):  # 我的最愛
             fav_list = Favorite.objects.filter(
                 fav_user=User.objects.get(acc=request.session["acc"])
             )
+            total = len(fav_list)
             return render(request, "favorite.html", locals())
         except:
             mess = "查詢錯誤"
@@ -570,7 +574,7 @@ def show_type_movie(request, movieType):
         user = None
     # '__contains':type欄位包含特定字段的資料
     movielist = Movie.objects.filter(type__contains=movieType)
-
+    movieType = movieType
     return render(request, "typeShowMovie.html", locals())
 
 

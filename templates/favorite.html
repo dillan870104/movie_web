@@ -1,19 +1,35 @@
 {% extends 'base.html' %}
+{% block header %}
+<h1>收藏清單</h1>
+<span class="subheading">你總共收藏了{{ total }}部電影</span>
+{% endblock %}
 {% block content %}
-<table>
-
-{% if fav_list %}
-    {% for fav in fav_list %}
+<!-- Main Content-->
+<div class="container px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-7">
+            {% if fav_list %}
+            {% for fav in fav_list %}
+            <!-- Post preview-->
+            <div class="post-preview">
                 
-        <tr>
-            <td>{{ fav.fav_movie.title }}<br>
-            {{ fav.fav_movie.title_en }}</td>
-            <td><a href="/favorite/del/{{ fav.fav_movie.id }}">移除</a></td>
-        </tr>
-        {% endfor %}
-{% else %}
-    <h1>尚未加入電影</h1>
+                <a href="/movie/{{ fav.fav_movie.id }}">
+                    <h2 class="post-title">{{ fav.fav_movie.title }}</h2>
+                    <h3 class="post-subtitle">{{ fav.fav_movie.title_en }}</h3>
+                </a>
+                <div class="d-flex justify-content-end mb-4 " style='display: inline-block;'><a class="btn btn-primary text-uppercase" href="/favorite/del/{{ fav.fav_movie.id }}">移除</a></div>
+            </div>
+            <!-- Divider-->
+            <hr class="my-4" />
+            
+            {% endfor %}
+            {% else %}
+            <div class="post-preview">
+                <h2 style="text-align: center;">尚未加入電影</h2>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 
-{% endif %}
-</table>
 {% endblock %}
