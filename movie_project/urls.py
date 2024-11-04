@@ -22,7 +22,8 @@ from movie_ticket_booking import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.movielist),
-    path("index/", views.movielist),
+    path("movielist/", views.movielist),
+    path("movielist/<int:page>/", views.movielistPage),
     path("hot/", views.hot_movie),
     path("db_control/", views.db_control),
     path("update/<str:cinemaName>", views.movie_update),

@@ -243,13 +243,35 @@ def del_show(request, theaterName):
 
 
 def movielist(request):
+    movielistAll = Movie.objects.all()
+    max_page = int(len(movielistAll) / 20)
+    movielist = []
+    for i in movielistAll[0:20]:
+        movielist.append(i)
+    max_page = [page + 1 for page in range(max_page + 1)]
     try:
-        movielist = Movie.objects.all()
         user = request.session["username"]
         admin = request.session["admin"]
         return render(request, "home.html", locals())
     except:
-        movielist = Movie.objects.all()
+        user = None
+        admin = None
+        return render(request, "home.html", locals())
+
+
+def movielistPage(request, page):
+    movielistAll = Movie.objects.all()
+    max_page = int(len(movielistAll) / 20)
+    movielist = []
+    for i in movielistAll[(page - 1) * 20 : page * 20]:
+        movielist.append(i)
+    max_page = [page + 1 for page in range(max_page + 1)]
+
+    try:
+        user = request.session["username"]
+        admin = request.session["admin"]
+        return render(request, "home.html", locals())
+    except:
         user = None
         admin = None
         return render(request, "home.html", locals())
@@ -614,6 +636,7 @@ def show_type_list(request):
     # print("//////")
     for type in type_list:
         type_list_pic.append(
+            # orderby('?').first() 隨機排序取第一筆資料
             [type, Movie.objects.filter(type__contains=type).order_by("?").first()]
         )
         # print(type)
