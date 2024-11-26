@@ -13,15 +13,6 @@ from movie_ticket_booking.form import RegisterForm
 
 import random
 
-# 排程測試
-# from .task import (
-#     run_showtimes_task,
-#     run_vieshow_task,
-#     run_ambassador_task,
-#     run_miramar_task,
-#     run_miranewcinemas_task,
-# )
-
 
 # 寄送驗證信
 def send_verify(email, verify):
